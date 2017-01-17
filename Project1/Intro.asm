@@ -25,6 +25,7 @@ greaterThanMessage Byte "The first number is greater than the second!",0
 
 byeMessage BYTE "bye!",0
 
+
 ;Holders for user values
 n1 DWORD ?
 n2 DWORD ?
@@ -38,6 +39,10 @@ remainder DWORD ?
 
 quotientFloat REAL8 ?
 
+;For floating point print
+significand DWORD ?
+exponent DWORD ?
+toPrint BYTE ?
 .code
 main PROC
 
@@ -77,8 +82,8 @@ operationBody:
 	jmp done
 
 	lessThan:
-	mov edx, OFFSET lessThanMessage
-	call WriteString
+		mov edx, OFFSET lessThanMessage
+		call WriteString
 	
 	;Regardles of outcome, print CrLf
 	done:
@@ -177,5 +182,37 @@ printVal PROC
 	call CrLf 
 	ret
 printVal ENDP
+
+;Prints an 8 bit floating point number up to edx decimal places
+;st0: number
+;ebx: How many decimal places
+printFloat PROC
+
+	;init values
+	mov exponent, 0
+	mov significand, 0
+
+	;exponent in st0, significand in st1
+	fxstract
+	fistp exponent ; contains exponent
+	fistp significand ; contains significand
+	
+	mov eax, significand
+	
+	toIntStack:
+		;Divide eax by 10
+		div 10
+		;push remainder on stack
+		push edx
+		;if eax != 0, continue
+		cmp eax, 0
+	jg toIntStack
+	printDecimal:
+		pop edx
+		
+	
+printFloat ENDP
+
+
 
 END main
