@@ -1,13 +1,13 @@
-Microsoft (R) Macro Assembler Version 14.00.24210.0	    01/19/17 10:26:41
-Intro (Intro.asm					     Page 1 - 1
+Microsoft (R) Macro Assembler Version 14.00.24210.0	    01/12/17 11:32:46
+Program Template (Template.asm				     Page 1 - 1
 
 
-				TITLE Intro (Intro.asm)
-				; Program Description: Displays my name and program title, and performs all of the basic arithmetical operations on two user defined numbers.
-				; Author: Tristan Thompson
-				; Creation Date: 1/12/17
+				TITLE Program Template (Template.asm)
+				; Program Description:
+				; Author:
+				; Creation Date:
 				; Revisions:
-				; Date: 1/12/17
+				; Date:
 				INCLUDE Irvine32.inc
 			      C ; Include file for Irvine32.lib             (Irvine32.inc)
 			      C 
@@ -27,266 +27,18 @@ Microsoft (R) Macro Assembler Version 14.00.24210.0	    01/19/17 10:26:41
 			      C .LIST
 			      C 
  00000000			.data
-
-				;Strings to display
- 00000000 4D 79 20 6E 61	nameAndTitle BYTE "My name is Tristan, and this is Intro!",0
-	   6D 65 20 69 73
-	   20 54 72 69 73
-	   74 61 6E 2C 20
-	   61 6E 64 20 74
-	   68 69 73 20 69
-	   73 20 49 6E 74
-	   72 6F 21 00
- 00000027 47 69 76 65 20	instructions BYTE "Give me a number",0
-	   6D 65 20 61 20
-	   6E 75 6D 62 65
-	   72 00
- 00000038 47 6F 20 61 67	repeatMessage BYTE "Go again? y for yes other for no.",0
-	   61 69 6E 3F 20
-	   79 20 66 6F 72
-	   20 79 65 73 20
-	   6F 74 68 65 72
-	   20 66 6F 72 20
-	   6E 6F 2E 00
-
-
-
- 0000005A 73 75 6D 3A 20	sumMessage BYTE "sum: ",0
-	   00
- 00000060 64 69 66 66 65	differenceMessage BYTE "difference: ",0
-	   72 65 6E 63 65
-	   3A 20 00
- 0000006D 70 72 6F 64 75	productMessage BYTE "product: ",0
-	   63 74 3A 20 00
- 00000077 71 75 6F 74 69	quotientMessage BYTE "quotient: ",0
-	   65 6E 74 3A 20
-	   00
- 00000082 72 65 6D 61 69	remainderMessage BYTE "remainder: ",0
-	   6E 64 65 72 3A
-	   20 00
-
- 0000008E 54 68 65 20 66	lessThanMessage BYTE "The first number is less than the second!",0
-	   69 72 73 74 20
-	   6E 75 6D 62 65
-	   72 20 69 73 20
-	   6C 65 73 73 20
-	   74 68 61 6E 20
-	   74 68 65 20 73
-	   65 63 6F 6E 64
-	   21 00
- 000000B8 54 68 65 20 66	greaterThanMessage Byte "The first number is greater than the second!",0
-	   69 72 73 74 20
-	   6E 75 6D 62 65
-	   72 20 69 73 20
-	   67 72 65 61 74
-	   65 72 20 74 68
-	   61 6E 20 74 68
-	   65 20 73 65 63
-	   6F 6E 64 21 00
-
- 000000E5 62 79 65 21 00	byeMessage BYTE "bye!",0
-
-
-				;Holders for user values
- 000000EA 00000000		n1 DWORD ?
- 000000EE 00000000		n2 DWORD ?
-
-				;Holders for arithmetic operations
- 000000F2 00000000		sum DWORD ?
- 000000F6 00000000		difference DWORD ?
- 000000FA 00000000		product DWORD ?
- 000000FE 00000000		quotient DWORD ?
- 00000102 00000000		remainder DWORD ?
-
- 00000106			quotientFloat REAL8 ?
-	   0000000000000000
-
-				;For floating point print
- 0000010E 00000000		significand DWORD ?
- 00000112 00000000		exponent DWORD ?
- 00000116 00			toPrint BYTE ?
+				; (insert variables here)
  00000000			.code
  00000000			main PROC
-
-					;Display name and title
- 00000000  BA 00000000 R		mov edx, OFFSET nameAndTitle
- 00000005  E8 00000000 E		call WriteString
- 0000000A  E8 00000000 E		call CrLf
-
-				;EC: repeat untill quit
- 0000000F			operationBody:
-					;Get first number
- 0000000F  BA 00000027 R		mov edx, OFFSET instructions
- 00000014  E8 00000000 E		call WriteString
- 00000019  E8 00000000 E		call CrLf
-
- 0000001E  E8 00000000 E		call ReadInt ;Value now in eax
- 00000023  A3 000000EA R		mov n1, eax ;Keep a copy for math
-
-					;Get second number
- 00000028  BA 00000027 R		mov edx, OFFSET instructions
- 0000002D  E8 00000000 E		call WriteString
- 00000032  E8 00000000 E		call CrLf
-
- 00000037  E8 00000000 E		call ReadInt
- 0000003C  A3 000000EE R		mov n2, eax
-
-					;EC: gt\lt operation
- 00000041  A1 000000EA R		mov eax, n1
- 00000046  3B 05 000000EE R		cmp eax, n2
-					
-					;IF n2 > n1 print lessThanMessage
-					;ELSE print greaterThanMessage
- 0000004C  7C 0C			jl lessThan
-
- 0000004E  BA 000000B8 R		mov edx, OFFSET greaterThanMessage
- 00000053  E8 00000000 E		call WriteString
- 00000058  EB 0A			jmp done
-
- 0000005A				lessThan:
- 0000005A  BA 0000008E R			mov edx, OFFSET lessThanMessage
- 0000005F  E8 00000000 E			call WriteString
-					
-					;Regardles of outcome, print CrLf
- 00000064				done:
- 00000064  E8 00000000 E		call CrLf
-
-					;sum operation (n1+n2)
- 00000069  A1 000000EA R		mov eax, n1
- 0000006E  03 05 000000EE R		add eax, n2
- 00000074  A3 000000F2 R		mov sum, eax
-
-					;difference operation (n1-n2)
- 00000079  A1 000000EA R		mov eax, n1
- 0000007E  2B 05 000000EE R		sub eax, n2
- 00000084  A3 000000F6 R		mov difference, eax
-
-
-					;product operation (n1*n2)
- 00000089  A1 000000EA R		mov eax, n1
- 0000008E  F7 25 000000EE R		mul n2
- 00000094  A3 000000FA R		mov product, eax
-
-					;quotient/remainder operation (n1//n2)/(n1%n2)
- 00000099  A1 000000EA R		mov eax, n1
- 0000009E  F7 35 000000EE R		div n2
- 000000A4  A3 000000FE R		mov quotient, eax
- 000000A9  89 15 00000102 R		mov remainder, edx
-
-					;EC: floating point quotient (n1/n2)
-					
-					;Load both values into FPU
- 000000AF  DB 05 000000EA R		fild n1
- 000000B5  DB 05 000000EE R		fild n2
-
-					;divide and store result into st0
- 000000BB  DE F9			fdivp 
-
-					;Pop and store in quotientFloat
- 000000BD  DD 1D 00000106 R		fstp quotientFloat
-
-					;Display each result
-					
-					;sum
- 000000C3  BA 0000005A R		mov edx, OFFSET sumMessage
- 000000C8  A1 000000F2 R		mov eax, sum
- 000000CD  E8 00000073			call printVal
-
-					;difference
- 000000D2  BA 00000060 R		mov edx, OFFSET differenceMessage
- 000000D7  A1 000000F6 R		mov eax, difference
- 000000DC  E8 00000064			call printVal
-
-					;product
- 000000E1  BA 0000006D R		mov edx, OFFSET productMessage
- 000000E6  A1 000000FA R		mov eax, product
- 000000EB  E8 00000055			call printVal
-
-					;quotient
- 000000F0  BA 00000077 R		mov edx, OFFSET quotientMessage
- 000000F5  A1 000000FE R		mov eax, quotient
- 000000FA  E8 00000046			call printVal
-
-					;EC: fp quotient
-					;TODO: figure out how to do fp output
-
-					;remainder
- 000000FF  BA 00000082 R		mov edx, OFFSET remainderMessage
- 00000104  A1 00000102 R		mov eax, remainder
- 00000109  E8 00000037			call printVal
-
-					;EC: repeat untill quit
- 0000010E  BA 00000038 R		mov edx, OFFSET repeatMessage
- 00000113  E8 00000000 E		call WriteString
- 00000118  E8 00000000 E		call CrLF
- 0000011D  E8 00000000 E		call ReadChar
-
- 00000122  3C 79			cmp al, 'y'
- 00000124  0F 84 FFFFFEE5		je operationBody
-
-
-					;bye!
- 0000012A  BA 000000E5 R		mov edx, OFFSET byeMessage
- 0000012F  E8 00000000 E		call WriteString
- 00000134  E8 00000000 E		call CrLf
-					
-					;Keep the window open untill enter is pressed.
- 00000139  E8 00000000 E		call ReadInt 
-					exit
- 0000013E  6A 00	   *	    push   +000000000h
- 00000140  E8 00000000 E   *	    call   ExitProcess
- 00000145			main ENDP
-
-				;Prints a message and then a value.
-				;edx: message offset
-				;eax: number
- 00000145			printVal PROC
- 00000145  E8 00000000 E		call WriteString
- 0000014A  E8 00000000 E		call WriteInt
- 0000014F  E8 00000000 E		call CrLf 
- 00000154  C3				ret
- 00000155			printVal ENDP
-
-				;Prints an 8 bit floating point number up to edx decimal places
-				;st0: number
-				;ebx: How many decimal places
- 00000155			printFloat PROC
-
-					;init values
- 00000155  C7 05 00000112 R		mov exponent, 0
-	   00000000
- 0000015F  C7 05 0000010E R		mov significand, 0
-	   00000000
-
-					;exponent in st0, significand in st1
- 00000169  D9 F4			fxtract
- 0000016B  DB 1D 00000112 R		fistp exponent ; contains exponent
- 00000171  DB 1D 0000010E R		fistp significand ; contains significand
-					
-					;Separate values from eax, count how many values there are.
- 00000177				toIntStack:
- 00000177  41					inc ecx
-						div 10
-Intro.asm(203) : error A2001:immediate operand not allowed
- 00000178  52					push edx
- 00000179  83 F8 00				cmp eax, 0
- 0000017C  7F F9			jg toIntStack
- 0000017E  A1 0000010E R		mov eax, significand
- 00000183  83 F8 00			cmp eax, 0
-					;jg posSignificand
-					;If there's a negative significand, we want to pad with zeros first
- 00000186  2B C8			sub ecx, eax
- 00000188				printValues:
- 00000188  5A					pop edx
- 00000189  E8 00000000 E			call WriteChar
-						
- 0000018E			printFloat ENDP
-
-
-
+				; (insert executable instructions here)
+				exit
+ 00000000  6A 00	   *	    push   +000000000h
+ 00000002  E8 00000000 E   *	    call   ExitProcess
+ 00000007			main ENDP
+				; (insert additional procedures here)
 				END main
-Microsoft (R) Macro Assembler Version 14.00.24210.0	    01/19/17 10:26:41
-Intro (Intro.asm					     Symbols 2 - 1
+Microsoft (R) Macro Assembler Version 14.00.24210.0	    01/12/17 11:32:46
+Program Template (Template.asm				     Symbols 2 - 1
 
 
 
@@ -379,8 +131,8 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 00000117 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 0000018E Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 00000000 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 00000007 Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -487,14 +239,7 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000145 Public STDCALL
-  operationBody  . . . . . . . .	L Near	 0000000F _TEXT	
-  lessThan . . . . . . . . . . .	L Near	 0000005A _TEXT	
-  done . . . . . . . . . . . . .	L Near	 00000064 _TEXT	
-printFloat . . . . . . . . . . .	P Near	 00000155 _TEXT	Length= 00000039 Public STDCALL
-  toIntStack . . . . . . . . . .	L Near	 00000177 _TEXT	
-  printValues  . . . . . . . . .	L Near	 00000188 _TEXT	
-printVal . . . . . . . . . . . .	P Near	 00000145 _TEXT	Length= 00000010 Public STDCALL
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000007 Public STDCALL
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
@@ -716,17 +461,10 @@ WriteConsole . . . . . . . . . .	Text   	 WriteConsoleA
 black  . . . . . . . . . . . . .	Number	 00000000h   
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
-byeMessage . . . . . . . . . . .	Byte	 000000E5 _DATA	
 cyan . . . . . . . . . . . . . .	Number	 00000003h   
-differenceMessage  . . . . . . .	Byte	 00000060 _DATA	
-difference . . . . . . . . . . .	DWord	 000000F6 _DATA	
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0
-exponent . . . . . . . . . . . .	DWord	 00000112 _DATA	
 gray . . . . . . . . . . . . . .	Number	 00000008h   
-greaterThanMessage . . . . . . .	Byte	 000000B8 _DATA	
 green  . . . . . . . . . . . . .	Number	 00000002h   
-instructions . . . . . . . . . .	Byte	 00000027 _DATA	
-lessThanMessage  . . . . . . . .	Byte	 0000008E _DATA	
 lightBlue  . . . . . . . . . . .	Number	 00000009h   
 lightCyan  . . . . . . . . . . .	Number	 0000000Bh   
 lightGray  . . . . . . . . . . .	Number	 00000007h   
@@ -734,25 +472,10 @@ lightGreen . . . . . . . . . . .	Number	 0000000Ah
 lightMagenta . . . . . . . . . .	Number	 0000000Dh   
 lightRed . . . . . . . . . . . .	Number	 0000000Ch   
 magenta  . . . . . . . . . . . .	Number	 00000005h   
-n1 . . . . . . . . . . . . . . .	DWord	 000000EA _DATA	
-n2 . . . . . . . . . . . . . . .	DWord	 000000EE _DATA	
-nameAndTitle . . . . . . . . . .	Byte	 00000000 _DATA	
-productMessage . . . . . . . . .	Byte	 0000006D _DATA	
-product  . . . . . . . . . . . .	DWord	 000000FA _DATA	
-quotientFloat  . . . . . . . . .	QWord	 00000106 _DATA	
-quotientMessage  . . . . . . . .	Byte	 00000077 _DATA	
-quotient . . . . . . . . . . . .	DWord	 000000FE _DATA	
 red  . . . . . . . . . . . . . .	Number	 00000004h   
-remainderMessage . . . . . . . .	Byte	 00000082 _DATA	
-remainder  . . . . . . . . . . .	DWord	 00000102 _DATA	
-repeatMessage  . . . . . . . . .	Byte	 00000038 _DATA	
-significand  . . . . . . . . . .	DWord	 0000010E _DATA	
-sumMessage . . . . . . . . . . .	Byte	 0000005A _DATA	
-sum  . . . . . . . . . . . . . .	DWord	 000000F2 _DATA	
-toPrint  . . . . . . . . . . . .	Byte	 00000116 _DATA	
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
 wsprintf . . . . . . . . . . . .	Text   	 wsprintfA
 yellow . . . . . . . . . . . . .	Number	 0000000Eh   
 
 	   0 Warnings
-	   1 Errors
+	   0 Errors

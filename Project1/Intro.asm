@@ -193,24 +193,26 @@ printFloat PROC
 	mov significand, 0
 
 	;exponent in st0, significand in st1
-	fxstract
+	fxtract
 	fistp exponent ; contains exponent
 	fistp significand ; contains significand
 	
-	mov eax, significand
-	
+	;Separate values from eax, count how many values there are.
 	toIntStack:
-		;Divide eax by 10
+		inc ecx
 		div 10
-		;push remainder on stack
 		push edx
-		;if eax != 0, continue
 		cmp eax, 0
 	jg toIntStack
-	printDecimal:
+	mov eax, significand
+	cmp eax, 0
+	;jg posSignificand
+	;If there's a negative significand, we want to pad with zeros first
+	sub ecx, eax
+	printValues:
 		pop edx
+		call WriteChar
 		
-	
 printFloat ENDP
 
 
