@@ -12,12 +12,11 @@ nameAndTitle BYTE "My name is Tristan, and this is Intro!",0
 instructions BYTE "Give me a number",0
 repeatMessage BYTE "Go again? y for yes other for no.",0
 
-
-
 sumMessage BYTE "sum: ",0
 differenceMessage BYTE "difference: ",0
 productMessage BYTE "product: ",0
 quotientMessage BYTE "quotient: ",0
+fpQuotientMessage BYTE "fp quotient: ",0
 remainderMessage BYTE "remainder: ",0
 
 lessThanMessage BYTE "The first number is less than the second!",0
@@ -41,8 +40,11 @@ quotientFloat REAL8 ?
 
 ;For floating point print
 significand DWORD ?
-exponent DWORD ?
+exponent SDWORD ?
 toPrint BYTE ?
+dot BYTE ".",0
+zero BYTE "0",0
+
 .code
 main PROC
 
@@ -112,7 +114,7 @@ operationBody:
 	mov remainder, edx
 
 	;EC: floating point quotient (n1/n2)
-	
+	finit
 	;Load both values into FPU
 	fild n1
 	fild n2
@@ -146,7 +148,11 @@ operationBody:
 	call printVal
 
 	;EC: fp quotient
-	;TODO: figure out how to do fp output
+	mov edx, OFFSET fpQuotientMessage
+	call WriteString
+	fld quotientFloat	
+	call WriteFloat
+	call CrLf
 
 	;remainder
 	mov edx, OFFSET remainderMessage
@@ -183,35 +189,7 @@ printVal PROC
 	ret
 printVal ENDP
 
-;Prints an 8 bit floating point number up to edx decimal places
-;st0: number
-;ebx: How many decimal places
-printFloat PROC
 
-	;init values
-	mov exponent, 0
-	mov significand, 0
-
-	;exponent in st0, significand in st1
-	fxstract
-	fistp exponent ; contains exponent
-	fistp significand ; contains significand
-	
-	mov eax, significand
-	
-	toIntStack:
-		;Divide eax by 10
-		div 10
-		;push remainder on stack
-		push edx
-		;if eax != 0, continue
-		cmp eax, 0
-	jg toIntStack
-	printDecimal:
-		pop edx
-		
-	
-printFloat ENDP
 
 
 
