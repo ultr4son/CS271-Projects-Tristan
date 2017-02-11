@@ -66,7 +66,7 @@ hInstance DWORD ?
 ;EC: Incredible juggling?
 
 ;The paddle should be drawn using Rectangle.
-paddleLeftPos DWORD 0
+paddleLeftPos SDWORD 0
 paddleRightPos DWORD 50
 
 ;Init these to client rect
@@ -191,7 +191,7 @@ WinProc PROC,
 	  paddleRight:
 		mov eax, clientRect.right
 		cmp paddleRightPos, eax
-		je done
+		jge done
 
 		add paddleLeftPos, PADDLE_X_INCREMENT
 		add paddleRightPos, PADDLE_X_INCREMENT
@@ -200,7 +200,7 @@ WinProc PROC,
 	  paddleLeft:
 		cmp paddleLeftPos, 0
 		
-		je done
+		jle done
 		
 		sub paddleLeftPos, PADDLE_X_INCREMENT
 		sub paddleRightPos, PADDLE_X_INCREMENT
