@@ -23,9 +23,6 @@ main PROC
 
 exit
 main ENDP
-; (insert additional procedures here)
-END main
-
 ;Greet the user.
 ;Parameters: (none)
 ;Returns: (none)
@@ -43,7 +40,7 @@ getUserData PROC
 	mov eax, 0
 	userDataInputLoop:
 		mov edx, OFFSET numberInputMessage
-		call edx
+		call WriteString
 		call ReadInt
 		call CrLf
 		;Store eax for after the call
@@ -54,6 +51,10 @@ getUserData PROC
 		call validate
 		
 		cmp eax, 0
+
+		;Restore eax to user input
+		pop eax 
+		
 		je userDataInputError
 		;Since we passed the checks and the value is in eax we can ret.
 		ret
@@ -66,11 +67,14 @@ getUserData ENDP
 
 ;Validate a given number
 ;Parameters: the number to validate 
-;1 if valid, 0 if not, in eax
+;Returns: 1 if valid, 0 if not, in eax
 validate PROC
 	push ebp
 	mov ebp, esp
-	mov eax, [ebp + 8]
+
+	num EQU [ebp + 8]
+
+	mov eax, num
 	cmp eax, LOW_BOUND
 	jl invalid
 	cmp eax, HIGH_BOUND
@@ -81,19 +85,61 @@ validate PROC
 	pop ebp
 	ret 4 
 	invalid:
-		mov ebx, 0
+		mov eax, 0
 		pop ebp
 		ret 4
 validate ENDP
 
+;Display composites
+;Parameters: The number of composites to display
+;Returns: (none)
 showComposites PROC
-	ret
+	push ebp
+	mov ebp, esp
+	
+	n EQU [ebp + 8]
+	
+	mov ebx, 4 ; First composite is 4
+	mov ecx, n
+
+	compositeLoop:
+		push ebx
+		call isComposite
+		cmp eax, 0
+		jg printComposite
+		loop compositeLoop
+		printComposite:
+			call WriteDec
+			loop compositeLoop
+	pop ebp
+	ret 4
 showComposites ENDP
 
+;Check if composite
+;Parameters: A positive number to check
+;Returns: 1 if composite, 0 if not
 isComposite PROC
-	ret
+	push ebp
+	mov ebp, esp
+
+	num EQU [ebp + 8]
+
+	mov eax, num
+	cmp eax, 4 ;Positive numbers less than 4 are not composite
+	jl done
+	
+	mov ebx, 2
+
+	done:
+		pop ebp 
+		ret 
 isComposite ENDP
 
+;Prints a goodbye message
+;Parameters: (none)
+;Returns: (none)
 farewell PROC
 	ret
 farewell ENDP
+END main
+

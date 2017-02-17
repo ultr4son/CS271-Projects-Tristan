@@ -1,13 +1,13 @@
-Microsoft (R) Macro Assembler Version 14.00.24210.0	    01/12/17 11:32:46
-Program Template (Template.asm				     Page 1 - 1
+Microsoft (R) Macro Assembler Version 14.00.24210.0	    02/16/17 22:21:28
+!Composite Numbers (composite.asm			     Page 1 - 1
 
 
-				TITLE Program Template (Template.asm)
-				; Program Description:
-				; Author:
-				; Creation Date:
+				TITLE Composite Numbers (composite.asm)
+				; Program Description: Calculate composite numbers. (Not primes)
+				; Author: Tristan Thompson
+				; Creation Date: 2/14/17
 				; Revisions:
-				; Date:
+				; Date: 2/14/17
 				INCLUDE Irvine32.inc
 			      C ; Include file for Irvine32.lib             (Irvine32.inc)
 			      C 
@@ -26,19 +26,128 @@ Microsoft (R) Macro Assembler Version 14.00.24210.0	    01/12/17 11:32:46
 			      C .NOLIST
 			      C .LIST
 			      C 
+ = 00000001			LOW_BOUND = 1
+ = 00000190			HIGH_BOUND = 400
+ = 0000000A			ROW_BREAK = 10
  00000000			.data
-				; (insert variables here)
+ 00000000 4D 79 20 6E 61	greetingMessage BYTE "My name is Tristan Thompson and this is Composite Numbers!",0
+	   6D 65 20 69 73
+	   20 54 72 69 73
+	   74 61 6E 20 54
+	   68 6F 6D 70 73
+	   6F 6E 20 61 6E
+	   64 20 74 68 69
+	   73 20 69 73 20
+	   43 6F 6D 70 6F
+	   73 69 74 65 20
+	   4E 75 6D 62 65
+	   72 73 21 00
+ 0000003B 47 69 76 65 20	numberInputMessage BYTE "Give me a number between 1 and 400: ",0
+	   6D 65 20 61 20
+	   6E 75 6D 62 65
+	   72 20 62 65 74
+	   77 65 65 6E 20
+	   31 20 61 6E 64
+	   20 34 30 30 3A
+	   20 00
+ 00000060 4E 6F 2C 20 69	errorMessage BYTE "No, idiot!",0
+	   64 69 6F 74 21
+	   00
+ 0000006B 20 20 20 00		spaces BYTE "   ",0
+ 0000006F 42 79 65 21		byeMessage BYTE "Bye!"
  00000000			.code
+
  00000000			main PROC
-				; (insert executable instructions here)
+ 00000000  E8 0000000C			call introduction
+
+ 00000005  E8 00000017			call getUserData
+
 				exit
- 00000000  6A 00	   *	    push   +000000000h
- 00000002  E8 00000000 E   *	    call   ExitProcess
- 00000007			main ENDP
-				; (insert additional procedures here)
+ 0000000A  6A 00	   *	    push   +000000000h
+ 0000000C  E8 00000000 E   *	    call   ExitProcess
+ 00000011			main ENDP
+				;Greet the user.
+				;Parameters: (none)
+				;Returns: (none)
+ 00000011			introduction PROC
+ 00000011  BA 00000000 R		mov edx, OFFSET greetingMessage
+ 00000016  E8 00000000 E		call WriteString
+ 0000001B  E8 00000000 E		call CrLf
+ 00000020  C3				ret
+ 00000021			introduction ENDP
+
+				;Get the composite number from the user.
+				;Parameters: (none)
+				;Returns: The composite number in eax.
+ 00000021			getUserData PROC
+ 00000021  B8 00000000			mov eax, 0
+ 00000026				userDataInputLoop:
+ 00000026  BA 0000003B R			mov edx, OFFSET numberInputMessage
+ 0000002B  E8 00000000 E			call WriteString
+ 00000030  E8 00000000 E			call ReadInt
+ 00000035  E8 00000000 E			call CrLf
+						;Store eax for after the call
+ 0000003A  50					push eax
+
+						;Push eax as an argument
+ 0000003B  50					push eax
+ 0000003C  E8 00000018				call validate
+						
+ 00000041  83 F8 00				cmp eax, 0
+
+						;Restore eax to user input
+ 00000044  58					pop eax 
+						
+ 00000045  74 01				je userDataInputError
+						;Since we passed the checks and the value is in eax we can ret.
+ 00000047  C3					ret
+ 00000048					userDataInputError:
+ 00000048  BA 00000060 R				mov edx, OFFSET errorMessage
+ 0000004D  E8 00000000 E				call WriteString
+ 00000052  E8 00000000 E				call CrLf
+ 00000057  EB CD					jmp userDataInputLoop
+ 00000059			getUserData ENDP
+
+				;Validate a given number
+				;Parameters: the number to validate 
+				;1 if valid, 0 if not, in eax
+ 00000059			validate PROC
+ 00000059  55				push ebp
+ 0000005A  8B EC			mov ebp, esp
+
+ = [ebp + 8]				num EQU [ebp + 8]
+
+ 0000005C  8B 45 08			mov eax, num
+ 0000005F  83 F8 01			cmp eax, LOW_BOUND
+ 00000062  7C 10			jl invalid
+ 00000064  3D 00000190			cmp eax, HIGH_BOUND
+ 00000069  7F 09			jg invalid
+					
+ 0000006B  B8 00000001			mov eax, 1
+
+ 00000070  5D				pop ebp
+ 00000071  C2 0004			ret 4 
+ 00000074				invalid:
+ 00000074  B8 00000000				mov eax, 0
+ 00000079  5D					pop ebp
+ 0000007A  C2 0004				ret 4
+ 0000007D			validate ENDP
+
+ 0000007D			showComposites PROC
+ 0000007D  C3				ret
+ 0000007E			showComposites ENDP
+
+ 0000007E			isComposite PROC
+ 0000007E  C3				ret
+ 0000007F			isComposite ENDP
+
+ 0000007F			farewell PROC
+ 0000007F  C3				ret
+ 00000080			farewell ENDP
 				END main
-Microsoft (R) Macro Assembler Version 14.00.24210.0	    01/12/17 11:32:46
-Program Template (Template.asm				     Symbols 2 - 1
+
+Microsoft (R) Macro Assembler Version 14.00.24210.0	    02/16/17 22:21:28
+!Composite Numbers (composite.asm			     Symbols 2 - 1
 
 
 
@@ -131,8 +240,8 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 00000000 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 00000007 Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 00000073 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 00000080 Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -239,9 +348,18 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000007 Public STDCALL
+farewell . . . . . . . . . . . .	P Near	 0000007F _TEXT	Length= 00000001 Public STDCALL
+getUserData  . . . . . . . . . .	P Near	 00000021 _TEXT	Length= 00000038 Public STDCALL
+  userDataInputLoop  . . . . . .	L Near	 00000026 _TEXT	
+  userDataInputError . . . . . .	L Near	 00000048 _TEXT	
+introduction . . . . . . . . . .	P Near	 00000011 _TEXT	Length= 00000010 Public STDCALL
+isComposite  . . . . . . . . . .	P Near	 0000007E _TEXT	Length= 00000001 Public STDCALL
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000011 Public STDCALL
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
+showComposites . . . . . . . . .	P Near	 0000007D _TEXT	Length= 00000001 Public STDCALL
+validate . . . . . . . . . . . .	P Near	 00000059 _TEXT	Length= 00000024 Public STDCALL
+  invalid  . . . . . . . . . . .	L Near	 00000074 _TEXT	
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 
 
@@ -313,6 +431,7 @@ HEAP_GROWABLE  . . . . . . . . .	Number	 00000002h
 HEAP_NO_SERIALIZE  . . . . . . .	Number	 00000001h   
 HEAP_REALLOC_IN_PLACE_ONLY . . .	Number	 00000010h   
 HEAP_ZERO_MEMORY . . . . . . . .	Number	 00000008h   
+HIGH_BOUND . . . . . . . . . . .	Number	 00000190h   
 IDABORT  . . . . . . . . . . . .	Number	 00000003h   
 IDCANCEL . . . . . . . . . . . .	Number	 00000002h   
 IDCLOSE  . . . . . . . . . . . .	Number	 00000008h   
@@ -331,6 +450,7 @@ KEY_EVENT  . . . . . . . . . . .	Number	 00000001h
 KEY_MASKS  . . . . . . . . . . .	Number	 0000001Fh   
 LEFT_ALT_PRESSED . . . . . . . .	Number	 00000002h   
 LEFT_CTRL_PRESSED  . . . . . . .	Number	 00000008h   
+LOW_BOUND  . . . . . . . . . . .	Number	 00000001h   
 MB_ABORTRETRYIGNORE  . . . . . .	Number	 00000002h   
 MB_APPLMODAL . . . . . . . . . .	Number	 00000000h   
 MB_CANCELTRYCONTINUE . . . . . .	Number	 00000006h   
@@ -365,6 +485,7 @@ OPEN_EXISTING  . . . . . . . . .	Number	 00000003h
 PeekConsoleInput . . . . . . . .	Text   	 PeekConsoleInputA
 RIGHT_ALT_PRESSED  . . . . . . .	Number	 00000001h   
 RIGHT_CTRL_PRESSED . . . . . . .	Number	 00000004h   
+ROW_BREAK  . . . . . . . . . . .	Number	 0000000Ah   
 ReadConsoleInput . . . . . . . .	Text   	 ReadConsoleInputA
 ReadConsole  . . . . . . . . . .	Text   	 ReadConsoleA
 SCROLLLOCK_ON  . . . . . . . . .	Number	 00000040h   
@@ -461,10 +582,13 @@ WriteConsole . . . . . . . . . .	Text   	 WriteConsoleA
 black  . . . . . . . . . . . . .	Number	 00000000h   
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
+byeMessage . . . . . . . . . . .	Byte	 0000006F _DATA	
 cyan . . . . . . . . . . . . . .	Number	 00000003h   
+errorMessage . . . . . . . . . .	Byte	 00000060 _DATA	
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0
 gray . . . . . . . . . . . . . .	Number	 00000008h   
 green  . . . . . . . . . . . . .	Number	 00000002h   
+greetingMessage  . . . . . . . .	Byte	 00000000 _DATA	
 lightBlue  . . . . . . . . . . .	Number	 00000009h   
 lightCyan  . . . . . . . . . . .	Number	 0000000Bh   
 lightGray  . . . . . . . . . . .	Number	 00000007h   
@@ -472,7 +596,10 @@ lightGreen . . . . . . . . . . .	Number	 0000000Ah
 lightMagenta . . . . . . . . . .	Number	 0000000Dh   
 lightRed . . . . . . . . . . . .	Number	 0000000Ch   
 magenta  . . . . . . . . . . . .	Number	 00000005h   
+numberInputMessage . . . . . . .	Byte	 0000003B _DATA	
+num  . . . . . . . . . . . . . .	Text   	 [ebp + 8]
 red  . . . . . . . . . . . . . .	Number	 00000004h   
+spaces . . . . . . . . . . . . .	Byte	 0000006B _DATA	
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
 wsprintf . . . . . . . . . . . .	Text   	 wsprintfA
 yellow . . . . . . . . . . . . .	Number	 0000000Eh   
