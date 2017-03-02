@@ -10,16 +10,23 @@ HIGH_BOUND = 400
 ROW_BREAK = 10
 .data
 greetingMessage BYTE "My name is Tristan Thompson and this is Composite Numbers!",0
-numberInputMessage BYTE "Give me a number between 1 and 400: ",0
+numberInputMessage BYTE "Give me a number between 1 and 400 composite numbers: ",0
 errorMessage BYTE "No, idiot!",0
 spaces BYTE "   ",0
-byeMessage BYTE "Bye!"
+byeMessage BYTE "Bye!",0
+
+outputs DWORD 0
 .code
 
 main PROC
 	call introduction
 
 	call getUserData
+
+	push eax
+	call showComposites
+	
+	call farewell
 
 exit
 main ENDP
@@ -99,18 +106,43 @@ showComposites PROC
 	
 	n EQU [ebp + 8]
 	
-	mov ebx, 4 ; First composite is 4
+	mov ebx, 3 ; First composite is 4
 	mov ecx, n
 
 	compositeLoop:
+		inc ebx
+		;preserve ebx
 		push ebx
+		;preserve ecx
+		push ecx
+
+		push ebx
+		
+		
 		call isComposite
+		pop ecx
+		pop ebx
+
 		cmp eax, 0
 		jg printComposite
-		loop compositeLoop
+		jmp compositeLoop
 		printComposite:
+			mov eax, ebx
 			call WriteDec
+			mov edx, OFFSET spaces
+			call WriteString
+			inc outputs
+			mov edx, outputs
+			cmp edx, ROW_BREAK
+			je break
 			loop compositeLoop
+			;no longer looping
+			jmp done
+			break:
+				mov outputs, 0
+				call CrLf
+			loop compositeLoop
+	done:
 	pop ebp
 	ret 4
 showComposites ENDP
@@ -124,21 +156,48 @@ isComposite PROC
 
 	num EQU [ebp + 8]
 
+
 	mov eax, num
-	cmp eax, 4 ;Positive numbers less than 4 are not composite
-	jl done
+
+	;Positive numbers less than 4 are not composite
+	cmp eax, 4 
+	jl fail
 	
 	mov ebx, 2
+	mov ecx, 0
+	checkLoop:
+		mov eax, num
+		cdq
+		;If we've reached the number and there were no clean divides, we don't need to check if it's composite anymore
+		cmp eax, ebx
+		je fail
 
-	done:
-		pop ebp 
-		ret 
+		div ebx
+		inc ebx
+
+		;If there was a clean division with a non-one (ebx starts at 2) and non-num (checked above) we can call the number composite 
+		cmp edx, 0
+		je composite
+		jmp checkLoop
+	composite:
+		pop ebp
+		mov eax, 1
+		ret 4
+	fail:
+		pop ebp
+		mov eax, 0
+		ret 4
+	 
 isComposite ENDP
 
 ;Prints a goodbye message
 ;Parameters: (none)
 ;Returns: (none)
 farewell PROC
+	mov edx, OFFSET byeMessage
+	call WriteString
+	call CrLf
+	call ReadInt
 	ret
 farewell ENDP
 END main
