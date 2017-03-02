@@ -15,6 +15,7 @@ RANDOM_MAX = 999
 introMessage BYTE "My name is Tristan Thompson and this is Random Operations!",0
 requestMessage BYTE "Give me a number of random numbers between 10 and 200: ",0
 errorMessage BYTE "No, idiot!",0
+arrayTitleMessage BYTE "Here are ya random nums boi:",0
 request DWORD ?
 randomNums DWORD REQUEST_MAX-REQUEST_MIN DUP(?)
 
@@ -26,7 +27,14 @@ main PROC
 	push OFFSET request
 	call getData
 
+	push request
+	push OFFSET randomNums
+	call fillArray
 
+	push OFFSET randomNums
+	push request
+	push OFFSET arrayTitleMessage
+	call displayList
 
 ; (insert executable instructions here)
 exit
@@ -63,7 +71,8 @@ getData PROC
 			call CrLf
 			jmp requestLoop
 	requestDone:
-	mov requestAddr, eax
+	mov esi, requestAddr
+	mov [esi], eax
 	pop ebp
 	ret
 getData ENDP
@@ -86,7 +95,7 @@ fillArray PROC
 		call RandomRange
 		add eax, RANDOM_MIN
 		
-		mov [ebx + esi], eax
+		mov [esi+ebx], eax
 		
 		add esi, TYPE DWORD
 		add fills, 1
@@ -97,6 +106,7 @@ fillArray PROC
 		jmp fillLoop
 
 	fillDone:
+
 	leave
 	ret
 fillArray ENDP
@@ -116,9 +126,42 @@ displayMedian ENDP
 ;Request: The amount of elements to display
 ;Title: A string reference to a message to display
 displayList PROC
-	enter
-	
+	LOCAL displays:DWORD
+ 	paramArrayDisplay EQU [ebx + 16]
+	paramDisplayAmount EQU [ebx + 12]
+	paramArrayTitle EQU [ebx + 8]
 
+	mov displays, 0
+
+	mov edx, paramArrayTitle
+	call WriteString
+	call CrLf
+
+	mov ecx, paramDisplayAmount
+
+	mov ebx, 0
+	mov esi, paramArrayDisplay
+
+	displayLoop:	
+
+		;Write current element
+		mov eax, [esi + ebx]
+		call WriteDec
+		xor eax, eax
+		mov al, ','
+		call WriteChar
+		mov al, ' ' 
+		call WriteChar		
+		
+		;Increment index and count
+		add displays, 1
+		add ebx, 4
+
+		mov eax, displays
+		cmp eax, ecx
+		je displayLoopDone
+		
+	displayLoopDone:
 
 	leave
 	ret
