@@ -82,12 +82,16 @@ getData ENDP
 ;Request: the amount of numbers to generate
 ;Array: A reference to the array to fill
 fillArray PROC
-	LOCAL fills:DWORD
+	push ebp 
+	mov ebp, esp
+	sub esp , TYPE DWORD
+	fills EQU [ebp - 4]
 	paramRequest EQU [ebp + 12]
 	paramArray EQU [ebp + 8]
 
 	mov esi, 0
-	mov fills, 0
+	mov eax, 0
+	mov fills, eax	
 	mov ebx, paramArray
 
 	fillLoop:
@@ -98,7 +102,9 @@ fillArray PROC
 		mov [esi+ebx], eax
 		
 		add esi, TYPE DWORD
-		add fills, 1
+		mov eax, fills
+		add eax, 1
+		mov fills, eax
 
 		mov eax, fills
 		cmp eax, paramRequest
@@ -106,9 +112,10 @@ fillArray PROC
 		jmp fillLoop
 
 	fillDone:
-
-	leave
-	ret
+	mov esp, ebp
+	pop ebp
+	
+	ret 
 fillArray ENDP
 
 sortList PROC
